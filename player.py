@@ -1,19 +1,33 @@
 import pygame
 from settings import *
+from support import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, group):
         super().__init__(group)
         
+        self.import_assets()
+        self.status = "down"
+        self.frame_index = 0
+        
         # general setup
-        self.image = pygame.Surface((30,60))
-        self.image.fill('brown')
+        self.image = self.animations[self.status][self.frame_index]
         self.rect = self.image.get_rect(center = pos)
     
         # movement
         self.direction = pygame.math.Vector2(0, 0)
         self.pos = pygame.math.Vector2(self.rect.center)
         self.speed = 100
+        
+    def import_assets(self):
+        self.animations = {"up" : [], "down": [], "left": [], "right": [], 
+                           "right_idle": [], "left_idle": [], "up_idle": [], "down_idle": []}
+        
+        for animation in self.animations.keys():
+            full_path = "/Users/chenrui/Documents/classes/2023 fall/hci 584/farming simulator/s1 - setup/graphics/character" + "/" + animation
+            self.animations[animation] = import_folder(full_path)
+        print(self.animations)   
+
     
     def input(self):
         keys = pygame.key.get_pressed()
