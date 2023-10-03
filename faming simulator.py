@@ -18,7 +18,8 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                
+            
+            # dt = self.clock.tick(give a number) / 1000 to change frame rate
             dt = self.clock.tick() / 1000
             self.level.run(dt)
             pygame.display.update()
