@@ -19,6 +19,7 @@ LAYERS = {
     "soil water" : 3,
     "rain floor" : 4,
     "house floor" : 5,
+    "ground" : 5,
     "ground plant" : 6,
     "main" : 7,
     "house top" : 8,

@@ -14,12 +14,15 @@ class Level:
         
         #sprite groups
         self.all_sprites = CameraGroup()
+        self.collision_sprites = pygame.sprite.Group()
+        #self.Player = Player((700,360), self.all_sprites)
         
         self.setup()
         self.overlay = Overlay(self.Player)
+        
     
     def setup(self):
-        tiled_data = load_pygame("s1 - setup/data/map.tmx")
+        tiled_data = load_pygame("assets/data/map.tmx")
         
         #house floor, layer order matters
         for layer in ["HouseFloor", "HouseFurnitureBottom"]:
@@ -33,25 +36,41 @@ class Level:
         
         #fences
         for x, y, surface in tiled_data.get_layer_by_name("Fence").tiles():
-            Generic((x * TILE_SIZE, y * TILE_SIZE), surface, self.all_sprites)
+            Generic((x * TILE_SIZE, y * TILE_SIZE), surface, [self.all_sprites, self.collision_sprites])
             
         # water
         water_frames = import_folder("assets/graphics/water")
         for x, y, surface in tiled_data.get_layer_by_name("Water").tiles():
             Water((x * TILE_SIZE, y * TILE_SIZE), water_frames, self.all_sprites, LAYERS["water"])
         
-        self.Player = Player((640,360), self.all_sprites)
+        
+        #trees
+        for tree in tiled_data.get_layer_by_name("Trees"):
+            Tree((tree.x, tree.y),tree.image, [self.all_sprites, self.collision_sprites], tree.name)
+        
+        # wildflowers, AttributeError: Element has no property tiles
+        for flower in tiled_data.get_layer_by_name("Decoration"):
+            Flower((flower.x, flower.y), flower.image, [self.all_sprites, self.collision_sprites], LAYERS["main"])
+        
+        # collisions on map(water, hills)
+        for x, y, s in tiled_data.get_layer_by_name("Collision").tiles():
+            Generic((x * TILE_SIZE, y * TILE_SIZE), pygame.Surface((TILE_SIZE, TILE_SIZE)), self.collision_sprites)
+        
+        
+        # set player initial location 
+        self.Player = Player((1560,1800), self.all_sprites, self.collision_sprites)
         
         Generic(
             pos = (0,0), 
             surf = pygame.image.load("assets/graphics/world/ground.png").convert_alpha(),
             groups = self.all_sprites,
             z = LAYERS["ground"])
-        #self.Player = Player((640,360), self.all_sprites)
+        
+        
         
     
     def run(self, dt):
-        self.display_surface.fill('black')
+        self.display_surface.fill("black")
         self.all_sprites.update(dt)
         camera_offset = pygame.math.Vector2(
             SCREEN_WIDTH / 2 - self.Player.rect.centerx,
@@ -62,10 +81,7 @@ class Level:
         
         self.overlay.display()
         
-      
-        
-
-    """   #original code, but the camera didn't work 
+""" #original code, but the camera didn't work 
 
         self.display_surface.fill('white')
         #self.all_sprites.draw(self.display_surface)
@@ -92,11 +108,10 @@ class CameraGroup(pygame.sprite.Group):
                     self.display_surface.blit(sprite.image, sprite.rect)
 """   
 
-
 class CameraGroup(pygame.sprite.Group):
     def customize_draw(self, display_surface, camera_offset):
         for layer in LAYERS.values():
-            for sprite in self.sprites():
+            for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
                 if sprite.z == layer:
                     offset_rect = sprite.rect.move(camera_offset)
                     display_surface.blit(sprite.image, offset_rect)
