@@ -19,6 +19,7 @@ class Level:
         self.collision_sprites = pygame.sprite.Group()
         #self.Player = Player((700,360), self.all_sprites)
         self.tree_sprites = pygame.sprite.Group()
+        self.apple_sprites = pygame.sprite.Group()
         self.interaction_sprites = pygame.sprite.Group()
         
         self.setup()
@@ -78,9 +79,10 @@ class Level:
         
     def reset(self):
         for tree in self.tree_sprites.sprites():
-            for apple in self.tree.apple_sprites.sprites():
+            for apple in self.apple_sprites.sprites():
                 apple.kill()
             tree.create_fruit()
+            
     
     def run(self, dt):
         self.display_surface.fill("black")

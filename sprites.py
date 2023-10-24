@@ -49,14 +49,7 @@ class Flower(Generic):
 class Tree(Generic):
     def __init__(self, pos, surf, groups, name, player_add):
         super().__init__(pos, surf, groups)
-        
-        # tree
-        self.health = 5
-        self.alive = True
-        stump_path = f'assets/graphics/stumps/{"small" if name == "small" else "large"}.png'
-        self.stump_sur = pygame.image.load(stump_path).convert_alpha()
-        self.invul_timer = Timer(200)
-        
+
         #fruits
         apple_images = {
         "red": "assets/graphics/fruit/Apple Red.png",
@@ -64,9 +57,10 @@ class Tree(Generic):
         "yellow": "assets/graphics/fruit/Apple Yellow.png",
         }
         self.apple_surf = pygame.image.load(apple_images["red"])
-        self.apple_pos = FRUITS_POS[name]
+        self.apple_pos = FRUITS_POS["RED APPLE"]
         self.apple_sprites = pygame.sprite.Group()
         self.create_fruit()
+        
         
         self.player_add = player_add
         
@@ -80,7 +74,7 @@ class Tree(Generic):
         
     def create_fruit(self):
         for pos in self.apple_pos:
-            if randint(0, 10) < 5:
+            if randint(0, 20) < 5:
                 x = pos[0] + self.rect.left
                 y = pos[1] + self.rect.top
                 Generic(

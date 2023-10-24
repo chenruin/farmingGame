@@ -101,7 +101,7 @@ class Player(pygame.sprite.Sprite):
     def input(self):
         keys = pygame.key.get_pressed()
         
-        if not self.timers["tool using"].active:
+        if not self.timers["tool using"].active and not self.sleep:
             #directions
             if keys[pygame.K_UP]:
                 self.direction.y = -1 #change sprite pics
