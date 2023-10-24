@@ -96,7 +96,7 @@ class Level:
         self.overlay.display()
         
         if self.Player.sleep:
-            self.transition.play(dt)
+            self.transition.play()
         
 """ #original code, but the camera didn't work 
 
