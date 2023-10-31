@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         } 
         
         # tools
-        self.tools = ["hoe", "water", "axe"]
+        self.tools = ["hoe", "water", "hand"]
         self.tools_index = 0
         self.selected_tool = self.tools[self.tools_index]
         
@@ -65,7 +65,7 @@ class Player(pygame.sprite.Sprite):
     def use_tool(self):
         if self.selected_tool == "hoe":
             pass
-        if self.selected_tool == "axe":
+        if self.selected_tool == "hand":
             for tree in self.tree_sprites.sprites():
                 if tree.rect.collidepoint(self.target_pos):
                     tree.pick()
@@ -84,20 +84,20 @@ class Player(pygame.sprite.Sprite):
         self.animations = {"up" : [], "down": [], "left": [], "right": [], 
                            "right_idle": [], "left_idle": [], "up_idle": [], "down_idle": [],
                            "right_hoe": [], "left_hoe": [], "up_hoe": [], "down_hoe": [],
-                           "right_water": [], "left_water": [], "up_water": [], "down_water": [],
-                           "right_axe": [], "left_axe": [], "up_axe": [], "down_axe": []}
+                           "right_water": [], "left_water": [], "up_water": [], "down_water": []}
         
         for animation in self.animations.keys():
             full_path = "assets/graphics/character" + "/" + animation
             self.animations[animation] = import_folder(full_path)
            
-    def animate(self, dt):
+    def animate(self, dt):  
+        
         self.frame_index += 6 * dt
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0
-            
+                
         self.image = self.animations[self.status][int(self.frame_index)]
-    
+        
     def input(self):
         keys = pygame.key.get_pressed()
         
@@ -153,8 +153,9 @@ class Player(pygame.sprite.Sprite):
                     if collided_inter_sprite[0].name == "Trader":
                         pass
                     else:
-                        self.status = "left_idle"
                         self.sleep = True
+                        self.status = "down_idle"
+                        
                           
     def get_status(self):
         # idle pic
@@ -162,7 +163,10 @@ class Player(pygame.sprite.Sprite):
             self.status = self.status.split('_')[0] + "_idle"
         # tool pic
         if self.timers["tool using"].active:
-            self.status = self.status.split('_')[0] + '_' + self.selected_tool
+            if self.selected_tool == "hand":
+                self.status = self.status.split('_')[0] + "_idle"
+            else:
+                self.status = self.status.split('_')[0] + '_' + self.selected_tool
         
     def move(self, dt):
         # normalize the vector

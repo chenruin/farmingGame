@@ -3,11 +3,11 @@ import pygame
 from pygame.sprite import AbstractGroup
 from settings import *
 from player import *
-from overlay import Overlay
+from overlay import *
 from sprites import *
 from pytmx.util_pygame import load_pygame
 from support import *
-from transition import Transition
+#from transition import Transition
 
 
 class Level:
@@ -25,6 +25,7 @@ class Level:
         self.setup()
         self.overlay = Overlay(self.Player)
         self.transition = Transition(self.reset, self.Player)
+        self.soil_layer = SoilLayer(self.all_sprites)
         
            
     def setup(self):
@@ -48,14 +49,14 @@ class Level:
         water_frames = import_folder("assets/graphics/water")
         for x, y, surface in tiled_data.get_layer_by_name("Water").tiles():
             Water((x * TILE_SIZE, y * TILE_SIZE), water_frames, self.all_sprites, LAYERS["water"])
-               
-        #trees
-        for tree in tiled_data.get_layer_by_name("Trees"):
-            Tree((tree.x, tree.y),tree.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], tree.name, self.player_add)
         
         # wildflowers, AttributeError: Element has no property tiles
         for flower in tiled_data.get_layer_by_name("Decoration"):
             Flower((flower.x, flower.y), flower.image, [self.all_sprites, self.collision_sprites], LAYERS["main"])
+            
+        #trees
+        for tree in tiled_data.get_layer_by_name("Trees"):
+            Tree((tree.x, tree.y),tree.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], tree.name, self.player_add)
         
         # collisions on map(water, hills)
         for x, y, s in tiled_data.get_layer_by_name("Collision").tiles():

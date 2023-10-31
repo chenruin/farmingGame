@@ -1,8 +1,8 @@
 import pygame
 from settings import *
-from settings import LAYERS
 from random import *
 from timer import Timer
+from pytmx.util_pygame import load_pygame
 
 class Generic(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups, z = LAYERS["main"]):
@@ -22,8 +22,7 @@ class Water(Generic):
     def __init__(self, pos, frames, groups, z):
         self.frames = frames
         self.frame_index = 0
-        
-        
+ 
         # sprite setup
         super().__init__(
             pos = pos, 
@@ -51,17 +50,17 @@ class Tree(Generic):
         super().__init__(pos, surf, groups)
 
         #fruits
-        apple_images = {
+        self.apple_images = {
         "red": "assets/graphics/fruit/Apple Red.png",
-        "green": "assets/graphics/fruit/Apple Green.png",
-        "yellow": "assets/graphics/fruit/Apple Yellow.png",
+        "golden": "assets/graphics/fruit/GoldenApple.png",
         }
-        self.apple_surf = pygame.image.load(apple_images["red"])
+        #self.apple_surf = pygame.image.load(self.apple_images["red"])
         self.apple_pos = FRUITS_POS["RED APPLE"]
+        #self.appleG_surf = pygame.image.load(apple_images["golden"])
+        #self.appleG_pos = FRUITS_POS["GOLDEN APPLE"]
         self.apple_sprites = pygame.sprite.Group()
         self.create_fruit()
-        
-        
+               
         self.player_add = player_add
         
     def pick(self):
@@ -77,8 +76,42 @@ class Tree(Generic):
             if randint(0, 20) < 5:
                 x = pos[0] + self.rect.left
                 y = pos[1] + self.rect.top
+                apple_type = "red"
+                
                 Generic(
                     pos = (x, y), 
-                    surf=self.apple_surf, 
+                    surf=pygame.image.load(self.apple_images[apple_type]),
                     groups=[self.apple_sprites, self.groups()[0]],
                     z = LAYERS["fruit"])
+            
+            elif randint(0,30) == 22:
+                x = pos[0] + self.rect.left
+                y = pos[1] + self.rect.top
+                apple_type = "golden" 
+            
+                Generic(
+                    pos = (x, y), 
+                    surf = pygame.image.load(self.apple_images[apple_type]),
+                    groups=[self.apple_sprites, self.groups()[0]],
+                    z = LAYERS["fruit"])
+                
+class SoilLayer:
+    def __init__(self, all_sprites):
+        
+        #
+        self.all_sprites = all_sprites
+        self.soil_sprites = pygame.sprite.Group()
+        
+        self.soil_surf = pygame.image.load("assets/graphics/soil/o.png")
+        
+    def create_soil_grid(self):
+        
+        ground = pygame.image.load("assets/graphics/world/ground.png")
+        # horizontal and vertical tiles
+        h_tiles = ground.get_width() // TILE_SIZE
+        v_tiles = ground.get_height() // TILE_SIZE
+        
+        self.grid = [[] for col in range(h_tiles) for row in range(v_tiles)]
+        for x, y, _ in load_pygame("assets/data/map.tmx").get_layer_by_name("Farmable").tiles():
+            self.grid[y][x].append('F')
+            print(self.grid)
