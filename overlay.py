@@ -7,7 +7,6 @@ class Overlay:
         self.player = player
         
         #imports
-        #farming simulator/s1 - setup/graphics/overlay/axe.png
         overlay_path = "assets/graphics/overlay"
         self.tools_surf = {tool: pygame.image.load(f'{overlay_path}/{tool}.png').convert_alpha() for tool in player.tools}
         self.seeds_surf = {seed: pygame.image.load(f'{overlay_path}/{seed}.png').convert_alpha() for seed in player.seeds}

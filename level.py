@@ -7,7 +7,8 @@ from overlay import *
 from sprites import *
 from pytmx.util_pygame import load_pygame
 from support import *
-#from transition import Transition
+#from soil import SoilLayer
+
 
 
 class Level:
@@ -17,17 +18,16 @@ class Level:
         #sprite groups
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
-        #self.Player = Player((700,360), self.all_sprites)
+        #self.player = Player((700,360), self.all_sprites)
         self.tree_sprites = pygame.sprite.Group()
         self.apple_sprites = pygame.sprite.Group()
         self.interaction_sprites = pygame.sprite.Group()
         
-        self.setup()
-        self.overlay = Overlay(self.Player)
-        self.transition = Transition(self.reset, self.Player)
         self.soil_layer = SoilLayer(self.all_sprites)
-        
-           
+        self.setup()
+        self.overlay = Overlay(self.player)
+        self.transition = Transition(self.reset, self.player)
+               
     def setup(self):
         tiled_data = load_pygame("assets/data/map.tmx")
         
@@ -54,7 +54,7 @@ class Level:
         for flower in tiled_data.get_layer_by_name("Decoration"):
             Flower((flower.x, flower.y), flower.image, [self.all_sprites, self.collision_sprites], LAYERS["main"])
             
-        #trees
+        #trees        
         for tree in tiled_data.get_layer_by_name("Trees"):
             Tree((tree.x, tree.y),tree.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], tree.name, self.player_add)
         
@@ -65,9 +65,16 @@ class Level:
         # set player initial location 
         for obj in tiled_data.get_layer_by_name("Player"):
             if obj.name == "Start":
-                self.Player = Player(pos=(obj.x, obj.y), group=self.all_sprites, collision_sprites=self.collision_sprites, tree_sprites= self.tree_sprites, interaction = self.interaction_sprites)
+                self.player = Player(
+                    pos=(obj.x, obj.y), 
+                    group=self.all_sprites, 
+                    collision_sprites=self.collision_sprites, 
+                    tree_sprites= self.tree_sprites, 
+                    interaction = self.interaction_sprites,
+                    soil_layer = self.soil_layer)
+                
             if obj.name == "Bed":
-                Interaction(pos=(obj.x, obj.y),size = (obj.width, obj.height), groups=self.interaction_sprites, name = obj.name)
+                Interaction(pos=(obj.x, obj.y),size = (obj.width, obj.height), groups=self.interaction_sprites, name = obj.name, fruit_type= None)
 
         Generic(
             pos = (0,0), 
@@ -76,12 +83,18 @@ class Level:
             z = LAYERS["ground"])
   
     def player_add(self, item):
-        self.Player.item_inventory[item] += 1
+        self.player.item_inventory[item] += 1
+        ####test
+        print(self.player.item_inventory)
         
     def reset(self):
+        # dry up water in soil
+        self.soil_layer.remove_water()
+        
+        #add more apple on the next day
         for tree in self.tree_sprites.sprites():
-            for apple in self.apple_sprites.sprites():
-                apple.kill()
+            #for apple in self.apple_sprites.sprites():
+                #apple.kill()
             tree.create_fruit()
             
     
@@ -89,23 +102,23 @@ class Level:
         self.display_surface.fill("black")
         self.all_sprites.update(dt)
         camera_offset = pygame.math.Vector2(
-            SCREEN_WIDTH / 2 - self.Player.rect.centerx,
-            SCREEN_HEIGHT / 2 - self.Player.rect.centery
+            SCREEN_WIDTH / 2 - self.player.rect.centerx,
+            SCREEN_HEIGHT / 2 - self.player.rect.centery
         )
         
         self.all_sprites.customize_draw(self.display_surface, camera_offset)
         
         
         self.overlay.display()
-        
-        if self.Player.sleep:
+                
+        if self.player.sleep:
             self.transition.play()
         
 """ #original code, but the camera didn't work 
 
         self.display_surface.fill('white')
         #self.all_sprites.draw(self.display_surface)
-        self.all_sprites.customize_draw(self.Player)
+        self.all_sprites.customize_draw(self.player)
         self.all_sprites.update(dt)
         
         self.overlay.display()
