@@ -88,6 +88,10 @@ class Level:
         print(self.player.item_inventory)
         
     def reset(self):
+        
+        # plant grow
+        self.soil_layer.update_plants()
+        
         # dry up water in soil
         self.soil_layer.remove_water()
         
