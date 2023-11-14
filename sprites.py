@@ -61,6 +61,7 @@ class Tree(Generic):
         self.apple_pos = FRUITS_POS["apple"]
         self.apple_sprites = pygame.sprite.Group()
         self.name = name
+        self.apple_list = []
         self.create_fruit()      
         
         self.player_add = player_add
@@ -79,30 +80,32 @@ class Tree(Generic):
             random_apple.kill()
                     
     def create_fruit(self):
-        for pos in self.apple_pos:
-            if randint(0, 99) < 10:
-                x = pos[0] + self.rect.left
-                y = pos[1] + self.rect.top
+        
+        num_red_apples = randint(0, 2)
+        
+        trees = sample(self.apple_pos, num_red_apples)
+        for pos in trees:
+        
+            x = pos[0] + self.rect.left
+            y = pos[1] + self.rect.top
+            if random() > 0.1:
                 fruit_type = "red apple"
-                
-                Generic(
-                    pos = (x, y), 
-                    surf=pygame.image.load(self.fruit_images[fruit_type]),
-                    groups=[self.apple_sprites, self.groups()[0]],
-                    z = LAYERS["fruit"],
-                    fruit_type= fruit_type)
-            
-            elif randint(0, 99) > 97 :
-                x = pos[0] + self.rect.left
-                y = pos[1] + self.rect.top
+            else:
                 fruit_type = "golden apple"
+                
+            print(fruit_type)
+            a = Generic(
+                pos = (x, y), 
+                surf=pygame.image.load(self.fruit_images[fruit_type]),
+                groups=[self.apple_sprites, self.groups()[0]],
+                z = LAYERS["fruit"],
+                fruit_type= fruit_type)
+            self.apple_list.append(a)
+        print(len(self.apple_list))
             
-                Generic(
-                    pos = (x, y), 
-                    surf = pygame.image.load(self.fruit_images[fruit_type]),
-                    groups=[self.apple_sprites, self.groups()[0]],
-                    z = LAYERS["fruit"],
-                    fruit_type= fruit_type)
+            
+            
+            
 
 class SoilTile(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups):
@@ -130,13 +133,12 @@ class Plant(pygame.sprite.Sprite):
         self.check_watered = check_watered
         
         self.stage = 0
-        self.max_age = len(self.frames) - 1
+        self.max_stage = len(self.frames) - 1
         self.grow_speed = GROW_SPEED[plant_type]
+        self. harvestable = False
         
         # sprite set
         self.image = self.frames[self.stage]
-        print(f"Initial image: {self.image}")  
-        print(f"Initial stage: {self.stage}")
         self.y_offset = -16 if plant_type == "corn" else -8
         self.rect = self.image.get_rect(midbottom = soil.rect.midbottom + pygame.math.Vector2(0, self.y_offset))
         self.z = LAYERS["ground plant"]
@@ -144,16 +146,26 @@ class Plant(pygame.sprite.Sprite):
     def grow(self):
         if self.check_watered(self.rect.center):
             self.stage += self.grow_speed
-            new_index = int(self.stage)
-            print(f"New index: {new_index}")
+        else:
+            self.stage += self.grow_speed/2
+            
+            if int(self.stage) > 0:
+                self.z = LAYERS["main"]
+                self.hitbox = self.rect.copy().inflate(-26, -self.rect.height * 0.4)
+            
+            if self.stage >= self.max_stage:
+                self.stage = self.max_stage
+                self.harvestable = True
+            
             self.image = self.frames[int(self.stage)]
             self.rect = self.image.get_rect(midbottom = self.soil.rect.midbottom +pygame.math.Vector2(0, self.y_offset))
                    
 class SoilLayer:
-    def __init__(self, all_sprites):
+    def __init__(self, all_sprites, collision_sprites):
         
         #
         self.all_sprites = all_sprites
+        self.collision_sprites = collision_sprites
         self.soil_sprites = pygame.sprite.Group()
         self.water_sprites = pygame.sprite.Group()
         self.plant_sprites = pygame.sprite.Group()
@@ -217,8 +229,7 @@ class SoilLayer:
                 pos = soil_sprite.rect.topleft
                 surf = self.water_surf
                 WaterTile(pos, surf, [self.all_sprites, self.water_sprites])
-                
-                
+                             
     def remove_water(self):
         #remove water sprite
         for sprite in self.water_sprites.sprites():
@@ -246,7 +257,7 @@ class SoilLayer:
                 
                 if "P" not in self.grid[y][x]:
                     self.grid[y][x].append("P")      
-                    Plant(seed, [self.all_sprites, self.plant_sprites], soil_sprite, self.check_watered)  
+                    Plant(seed, [self.all_sprites, self.plant_sprites, self.collision_sprites], soil_sprite, self.check_watered)  
                                
     def update_plants(self):
         for plant in self.plant_sprites.sprites():

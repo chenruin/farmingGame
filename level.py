@@ -23,7 +23,7 @@ class Level:
         self.apple_sprites = pygame.sprite.Group()
         self.interaction_sprites = pygame.sprite.Group()
         
-        self.soil_layer = SoilLayer(self.all_sprites)
+        self.soil_layer = SoilLayer(self.all_sprites, self.collision_sprites)
         self.setup()
         self.overlay = Overlay(self.player)
         self.transition = Transition(self.reset, self.player)
@@ -56,7 +56,7 @@ class Level:
             
         #trees        
         for tree in tiled_data.get_layer_by_name("Trees"):
-            Tree((tree.x, tree.y),tree.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], tree.name, self.player_add)
+            Tree((tree.x, tree.y), tree.image, [self.all_sprites, self.collision_sprites, self.tree_sprites], tree.name, self.player_add)
         
         # collisions on map(water, hills)
         for x, y, s in tiled_data.get_layer_by_name("Collision").tiles():
@@ -95,13 +95,12 @@ class Level:
         # dry up water in soil
         self.soil_layer.remove_water()
         
-        #add more apple on the next day
+        # add more apple on the next day
         for tree in self.tree_sprites.sprites():
-            #for apple in self.apple_sprites.sprites():
-                #apple.kill()
+            for apple in self.apple_sprites.sprites():
+                apple.kill()
             tree.create_fruit()
-            
-    
+                
     def run(self, dt):
         self.display_surface.fill("black")
         self.all_sprites.update(dt)
