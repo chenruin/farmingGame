@@ -70,13 +70,13 @@ class Tree(Generic):
         # remove fruits
         if len(self.apple_sprites.sprites()) > 0:
             random_apple = choice(self.apple_sprites.sprites())
-            print(random_apple)
+            
             
             fruit = random_apple.fruit_type
         
             self.player_add(fruit)
-            #test pos
-            print(random_apple.rect.topleft)            
+            
+                   
             random_apple.kill()
                     
     def create_fruit(self):
@@ -93,7 +93,7 @@ class Tree(Generic):
             else:
                 fruit_type = "golden apple"
                 
-            print(fruit_type)
+            
             a = Generic(
                 pos = (x, y), 
                 surf=pygame.image.load(self.fruit_images[fruit_type]),
@@ -101,7 +101,7 @@ class Tree(Generic):
                 z = LAYERS["fruit"],
                 fruit_type= fruit_type)
             self.apple_list.append(a)
-        print(len(self.apple_list))
+        
             
             
             
@@ -127,8 +127,7 @@ class Plant(pygame.sprite.Sprite):
         super().__init__(groups)
         self.plant_type = plant_type
         self.frames = import_folder(f"assets/graphics/fruit/{plant_type}")
-        print("Number of frames:", len(self.frames))  
-        print(f"Path: assets/graphics/fruit/{plant_type}")  
+        
         self.soil = soil
         self.check_watered = check_watered
         
@@ -147,18 +146,18 @@ class Plant(pygame.sprite.Sprite):
         if self.check_watered(self.rect.center):
             self.stage += self.grow_speed
         else:
-            self.stage += self.grow_speed/2
+            self.stage += self.grow_speed * 0.7
             
-            if int(self.stage) > 0:
-                self.z = LAYERS["main"]
-                self.hitbox = self.rect.copy().inflate(-26, -self.rect.height * 0.4)
-            
-            if self.stage >= self.max_stage:
-                self.stage = self.max_stage
-                self.harvestable = True
-            
-            self.image = self.frames[int(self.stage)]
-            self.rect = self.image.get_rect(midbottom = self.soil.rect.midbottom +pygame.math.Vector2(0, self.y_offset))
+        if int(self.stage) > 0:
+            self.z = LAYERS["main"]
+            self.hitbox = self.rect.copy().inflate(-26, -self.rect.height * 0.4)
+        
+        if self.stage >= self.max_stage:
+            self.stage = self.max_stage
+            self.harvestable = True
+        
+        self.image = self.frames[int(self.stage)]
+        self.rect = self.image.get_rect(midbottom = self.soil.rect.midbottom +pygame.math.Vector2(0, self.y_offset))
                    
 class SoilLayer:
     def __init__(self, all_sprites, collision_sprites):
@@ -249,7 +248,7 @@ class SoilLayer:
         return is_watered
                     
     def plant_seed(self, target_pos, seed):
-    
+        
         for soil_sprite in self.soil_sprites.sprites():
             if soil_sprite.rect.collidepoint(target_pos):
                 x = soil_sprite.rect.x // TILE_SIZE
@@ -261,5 +260,6 @@ class SoilLayer:
                                
     def update_plants(self):
         for plant in self.plant_sprites.sprites():
-            plant.grow()               
+            plant.grow()  
+                        
         

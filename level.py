@@ -23,10 +23,14 @@ class Level:
         self.apple_sprites = pygame.sprite.Group()
         self.interaction_sprites = pygame.sprite.Group()
         
+        
         self.soil_layer = SoilLayer(self.all_sprites, self.collision_sprites)
         self.setup()
         self.overlay = Overlay(self.player)
         self.transition = Transition(self.reset, self.player)
+        
+        #shop
+        self.shop_active = False
                
     def setup(self):
         tiled_data = load_pygame("assets/data/map.tmx")
@@ -71,9 +75,13 @@ class Level:
                     collision_sprites=self.collision_sprites, 
                     tree_sprites= self.tree_sprites, 
                     interaction = self.interaction_sprites,
-                    soil_layer = self.soil_layer)
+                    soil_layer = self.soil_layer,
+                    shop = self.shop,)
                 
             if obj.name == "Bed":
+                Interaction(pos=(obj.x, obj.y),size = (obj.width, obj.height), groups=self.interaction_sprites, name = obj.name, fruit_type= None)
+                
+            if obj.name == "trader":
                 Interaction(pos=(obj.x, obj.y),size = (obj.width, obj.height), groups=self.interaction_sprites, name = obj.name, fruit_type= None)
 
         Generic(
@@ -86,6 +94,9 @@ class Level:
         self.player.item_inventory[item] += 1
         ####test
         print(self.player.item_inventory)
+ 
+    def shop(self):
+        self.shop_active = not self.shop_active
         
     def reset(self):
         
@@ -100,22 +111,34 @@ class Level:
             for apple in self.apple_sprites.sprites():
                 apple.kill()
             tree.create_fruit()
-                
+ 
+    def plant_collision(self):
+        if self.soil_layer.plant_sprites:
+            for plant in self.soil_layer.plant_sprites:
+                if plant.harvestable and plant.rect.colliderect(self.player.hitbox):
+                    self.player_add(plant.plant_type)
+                    plant.kill()
+                    self.soil_layer.grid[plant.rect.centery // TILE_SIZE][plant.rect.centerx // TILE_SIZE].remove('P')
+                                     
     def run(self, dt):
         self.display_surface.fill("black")
         self.all_sprites.update(dt)
+        self.plant_collision()
+        
+        
         camera_offset = pygame.math.Vector2(
             SCREEN_WIDTH / 2 - self.player.rect.centerx,
             SCREEN_HEIGHT / 2 - self.player.rect.centery
         )
         
         self.all_sprites.customize_draw(self.display_surface, camera_offset)
-        
-        
+                
         self.overlay.display()
                 
         if self.player.sleep:
             self.transition.play()
+            
+        print(self.shop_active)
         
 """ #original code, but the camera didn't work 
 
