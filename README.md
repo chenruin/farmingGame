@@ -42,7 +42,7 @@ Welcome to the Farming Simulator Game! This interactive simulation game allows y
    - *Functionality:* Water plants to promote growth and speed up the maturation process.
 
 3. **Hand:**
-   - *Functionality:* Use the hand to pick up ripe apples from the trees.
+   - *Functionality:* Use the hand to pick up apples from the trees.
 
 ## Seeds:
 
@@ -53,6 +53,8 @@ Welcome to the Farming Simulator Game! This interactive simulation game allows y
 - **Use Seed (K):**
   - Once a seed is selected, press the K key to plant it in the prepared soil.
 
+  ![Alt text](<截屏2023-12-04 22.54.25.png>)
+
 ## Interactions:
 
 - **Interact with Bed (Space):**
@@ -62,4 +64,10 @@ Welcome to the Farming Simulator Game! This interactive simulation game allows y
 **Pro Tip:**
 - Watering plants with the Water Can can facilitate the speed of maturity. 
 
+- when plant is mature, it can be simply harvested by walk on it.
 
+## Potential bugs
+
+- if the apples not displaying on the tree, the crash may happen when player interact with bed, restart the game is recommended in this situation.
+
+![Alt text](<截屏2023-12-04 22.53.30.png>)!
