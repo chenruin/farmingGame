@@ -1,6 +1,6 @@
 # Farming Simulator Game User Guide
 
-Welcome to the Pygame Simulator Game! This interactive simulation allows you to explore a virtual world and engage with various tools to farm, water plants, harvest plants and pick up apples. Follow this user guide to get started.
+Welcome to the Farming Simulator Game! This interactive simulation game allows you to explore a virtual farm world and engage with various tools to farm, water plants, harvest plants and pick up apples. Follow this user guide to get started.
 
 ## Setup:
 
