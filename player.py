@@ -165,7 +165,8 @@ class Player(pygame.sprite.Sprite):
                 collided_inter_sprite = pygame.sprite.spritecollide(self, self.interaction, False)
                 if collided_inter_sprite:
                     if collided_inter_sprite[0].name == "Trader":
-                        self.shop()
+                        #self.shop()
+                        pass
                     else:
                         self.sleep = True
                         self.status = "down_idle"                       

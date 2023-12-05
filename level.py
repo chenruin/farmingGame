@@ -30,7 +30,9 @@ class Level:
         self.transition = Transition(self.reset, self.player)
         
         #shop
+        #self.menu = Menu(self.player, self.shop)
         self.shop_active = False
+        
                
     def setup(self):
         tiled_data = load_pygame("assets/data/map.tmx")
@@ -81,7 +83,7 @@ class Level:
             if obj.name == "Bed":
                 Interaction(pos=(obj.x, obj.y),size = (obj.width, obj.height), groups=self.interaction_sprites, name = obj.name, fruit_type= None)
                 
-            if obj.name == "trader":
+            if obj.name == "Trader":
                 Interaction(pos=(obj.x, obj.y),size = (obj.width, obj.height), groups=self.interaction_sprites, name = obj.name, fruit_type= None)
 
         Generic(
@@ -122,8 +124,14 @@ class Level:
                                      
     def run(self, dt):
         self.display_surface.fill("black")
-        self.all_sprites.update(dt)
-        self.plant_collision()
+        
+        #update
+        if self.shop_active:
+            #self.menu.update()
+            pass
+        else:
+            self.all_sprites.update(dt)
+            self.plant_collision()
         
         
         camera_offset = pygame.math.Vector2(
@@ -138,7 +146,6 @@ class Level:
         if self.player.sleep:
             self.transition.play()
             
-        print(self.shop_active)
         
 """ #original code, but the camera didn't work 
 
