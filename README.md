@@ -70,4 +70,4 @@ Welcome to the Farming Simulator Game! This interactive simulation game allows y
 
 - if the apples not displaying on the tree, the crash may happen when player interact with bed, restart the game is recommended in this situation.
 
-![Alt text](<截屏2023-12-04 22.53.30.png>)!
+![Alt text](<截屏2023-12-04 22.53.30.png>)
